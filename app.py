@@ -1,5 +1,6 @@
 from flask import Flask, request
 import json
+import numpy as np
 from bonusOptimization import HelperFunctions, BonusOptimizer
 
 app = Flask(__name__)
