@@ -1,6 +1,5 @@
 from flask import Flask, request
 import json
-import numpy as np
 from bonusOptimization import HelperFunctions, BonusOptimizer
 
 app = Flask(__name__)
@@ -11,20 +10,21 @@ def index():
 
 @app.route('/calculations/VigCalculator',methods=['GET'])
 def calculateVig():
-    params = json.loads(request.args['json'])
-    odds1,odds2 = (int(i) for i in params['odds'])
+    params = request.args['odds']
+    params = params.split(',')
+    odds1,odds2 = (int(i) for i in params)
     vig = HelperFunctions.calculateVig(odds1,odds2)
-    return vig
+    return {"Vig": vig}
 
 @app.route('/calculations/oddsConverter', methods=['GET'])
 def convertOdds():
     params = json.loads(request.args)
-    odds = params['odds']
+    odds = int(params['odds'])
     if params['format'] == 'american':
         new_odds = HelperFunctions.americanToFractional(odds)
     else:
         new_odds = HelperFunctions.fractionalToAmerican(odds)
-    return new_odds
+    return {"converted_odds":new_odds}
 
 if __name__ == '__main__':
-    app.run()
+    app.run(debug=True)
