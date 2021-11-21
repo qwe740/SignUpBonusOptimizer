@@ -1,5 +1,5 @@
-import numpy as np
 from scipy import optimize
+
 class HelperFunctions:
 
     @staticmethod
@@ -23,9 +23,25 @@ class HelperFunctions:
         fodds1 = cls.americanToFractional(odds1)
         fodds2 = cls.americanToFractional(odds2)
         winperc1 = 1/(fodds1+1)
-        winperc2 = 1/(fodds2+2)
+        winperc2 = 1/(fodds2+1)
         vig = winperc1+winperc2-1
         return vig
+    
+    @classmethod
+    def fairOdds(cls,odds1,odds2):
+        fodds1 = cls.americanToFractional(odds1)
+        fodds2 = cls.americanToFractional(odds2)
+        winperc1 = 1/(fodds1+1)
+        winperc2 = 1/(fodds2+1)
+        vig = cls.calculateVig(odds1,odds2)
+        half_vig = vig/2
+        newwinperc1 = winperc1-half_vig
+        newwinperc2 = winperc2-half_vig
+        newfodds1 = (1/newwinperc1)-1
+        newfodds2 = (1/newwinperc2)-1
+        newodds1 = cls.fractionalToAmerican(newfodds1)
+        newodds2 = cls.fractionalToAmerican(newfodds2)
+        return {'odds1': newodds1, 'odds2':newodds2}
 
     @classmethod
     def otherOddsGivenVig(cls,odds,vig):
@@ -35,6 +51,13 @@ class HelperFunctions:
         fodds2 = (1 / winperc2) - 1
         odds2 = cls.fractionalToAmerican(fodds2)
         return round(odds2)
+
+    @classmethod
+    def EVgivenFairOdds(cls,odds,fairodds):
+        fodds = cls.americanToFractional(odds)
+        true_winprob = 1/(cls.americanToFractional(fairodds)+1)
+        ev = ((1*fodds)*true_winprob) + (-1*(1-true_winprob))
+        return ev
 
 class BonusOptimizer:
     
