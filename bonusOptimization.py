@@ -1,9 +1,10 @@
 from scipy import optimize
+from typing import Optional, Dict
 
 class HelperFunctions:
 
     @staticmethod
-    def americanToFractional(odds):
+    def americanToFractional(odds: int) -> float:
         if odds < 0:
             fodds = -100/odds
         else:
@@ -11,7 +12,7 @@ class HelperFunctions:
         return fodds
 
     @staticmethod
-    def fractionalToAmerican(fodds):
+    def fractionalToAmerican(fodds: float) -> int:
         if fodds < 1:
             odds = -100/fodds
         else:
@@ -19,7 +20,7 @@ class HelperFunctions:
         return odds
 
     @classmethod
-    def calculateVig(cls,odds1,odds2):
+    def calculateVig(cls,odds1: int, odds2: int) -> float:
         fodds1 = cls.americanToFractional(odds1)
         fodds2 = cls.americanToFractional(odds2)
         winperc1 = 1/(fodds1+1)
@@ -28,7 +29,7 @@ class HelperFunctions:
         return vig
     
     @classmethod
-    def fairOdds(cls,odds1,odds2):
+    def fairOdds(cls,odds1: int, odds2: int) -> Dict[str,int]:
         fodds1 = cls.americanToFractional(odds1)
         fodds2 = cls.americanToFractional(odds2)
         winperc1 = 1/(fodds1+1)
@@ -44,16 +45,16 @@ class HelperFunctions:
         return {'odds1': newodds1, 'odds2':newodds2}
 
     @classmethod
-    def otherOddsGivenVig(cls,odds,vig):
+    def otherOddsGivenVig(cls,odds: int, vig: float) -> int:
         fodds = cls.americanToFractional(odds)
         winperc = 1/(fodds+1)
         winperc2 = vig - winperc + 1
         fodds2 = (1 / winperc2) - 1
         odds2 = cls.fractionalToAmerican(fodds2)
-        return round(odds2)
+        return int(odds2)
 
     @classmethod
-    def EVgivenFairOdds(cls,odds,fairodds):
+    def EVgivenFairOdds(cls,odds: int ,fairodds: int) -> float:
         fodds = cls.americanToFractional(odds)
         true_winprob = 1/(cls.americanToFractional(fairodds)+1)
         ev = ((1*fodds)*true_winprob) + (-1*(1-true_winprob))
@@ -62,7 +63,7 @@ class HelperFunctions:
 class BonusOptimizer:
     
     @staticmethod
-    def RFBetEV(stake,odds1,odds2,freebetconversion=0.65):
+    def RFBetEV(stake,odds1: int, odds2: int, freebetconversion: Optional[float] = 0.65) -> Dict[str,float]:
         fodds1 = HelperFunctions.americanToFractional(odds1)
         fodds2 = HelperFunctions.americanToFractional(odds2)
         def ifloss(stake2,*args):
@@ -77,7 +78,7 @@ class BonusOptimizer:
         return {"hedge_size": stake2, "expected_value": ev}
     
     @staticmethod
-    def BonusMatchEV(stake,odds1,odds2,freebetconversion=0.65):
+    def BonusMatchEV(stake: float, odds1: int, odds2: int, freebetconversion: Optional[float] = 0.65) -> Dict[str,float]:
         fodds1 = HelperFunctions.americanToFractional(odds1)
         fodds2 = HelperFunctions.americanToFractional(odds2)
         def ifloss(stake2,*args):
